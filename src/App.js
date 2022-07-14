@@ -7,7 +7,7 @@ import { GiHamburgerMenu } from "react-icons/gi";
 
 const LAUNCHDATA = `
  {
-  launchesPast(limit: 2) {
+  launchesPast(limit: 10) {
     mission_name
     launch_date_local
     rocket {
@@ -24,6 +24,26 @@ const LAUNCHDATA = `
 
 function App() {
   const [launches, setLaunches] = useState([]);
+  const [search, setSearch] = useState([""]);
+
+  const filterName = () => {
+    const Name = launches.map((i) => i.mission_name.toLowerCase()).sort();
+    setLaunches(Name);
+  };
+  // const filterSearch = () => {
+  //   const filterVal = launches.filter((lname) => {
+  //     if (search === "") {
+  //       return lname;
+  //     } else if (
+  //       lname.mission_name
+  //         .toLowerCase()
+  //         .includes(search.toString().toLowerCase())
+  //     ) {
+  //       return lname;
+  //     }
+  //   });
+  //   setLaunches(filterVal);
+  // };
 
   useEffect(() => {
     fetch("https://api.spacex.land/graphql/", {
@@ -49,45 +69,50 @@ function App() {
 
         <div className="input">
           <BsSearch className="icon" />
-          <input placeholder="Search by Status, Date, Name, and  Type " />
+          <input
+            placeholder="Search by Name"
+            type="text"
+            name="searchWord"
+            value={search}
+            onChange={(ev) => {
+              setSearch(ev.target.value);
+            }}
+            autoComplete="off"
+          />
         </div>
         <div className="filter">
           <p>Filter By: </p>
           <ul>
-            <li className="active">Status</li>
+            <li className="active">All</li>
+            <li onClick={filterName}>Name</li>
             <li>Date</li>
-            <li>Name</li>
-            <li>Author</li>
           </ul>
         </div>
         <main className="data">
           <div className="dataCon">
             <span>December 20</span>
-            {launches.map((launch) => (
-              <div key={launch.id} className="cont">
-                <img src={launch.ships.map((i) => i.image)} alt="" />
-                {console.log(launch.ships.map((i) => i.image))}
-                <div className="note">
-                  <h2>{launch.mission_name}</h2>
-                  <span>Port: {launch.ships.map((i) => i.name)}</span>;
-                  <p>{launch.launch_date_local}</p>
+            {launches
+              .filter((lname) => {
+                if (search === "") {
+                  return lname;
+                } else if (
+                  lname.mission_name
+                    .toLowerCase()
+                    .includes(search.toString().toLowerCase())
+                ) {
+                  return lname;
+                }
+              })
+              .map((launch) => (
+                <div key={launch.id} className="cont">
+                  <img src={launch.ships.map((i) => i.image)} alt="" />
+                  <div className="note">
+                    <h2>{launch.mission_name}</h2>
+                    <span>Port: {launch.ships.map((i) => i.name)}</span>;
+                    <p>{launch.launch_date_local}</p>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-          <div className="line"></div>
-          <div className="dataCon">
-            <span>December 21</span>
-            {launches.map((launch) => (
-              <div key={launch.id} className="cont">
-                <img src={launch.ships.map((i) => i.image)} alt="" />
-                <div className="note">
-                  <h2>{launch.mission_name}</h2>
-                  <span>Port: {launch.ships.map((i) => i.name)}</span>;
-                  <p>{launch.launch_date_local}</p>
-                </div>
-              </div>
-            ))}
+              ))}
           </div>
         </main>
         <footer>
