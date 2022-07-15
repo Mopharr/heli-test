@@ -23,28 +23,75 @@ const LAUNCHDATA = `
 `;
 
 function App() {
+  // get data state
   const [launches, setLaunches] = useState([]);
+  // search state
   const [search, setSearch] = useState([""]);
+  // Filter data state
+  const [sendRequest, setSendRequest] = useState(false);
 
+  // Search Filter 
+  const filterLaunches = launches.filter((lname) =>
+    lname.mission_name.toLowerCase().includes(search.toString().toLowerCase())
+  );
+
+  // Filter by name
   const filterName = () => {
-    const Name = launches.map((i) => i.mission_name.toLowerCase()).sort();
-    setLaunches(Name);
-  };
-  // const filterSearch = () => {
-  //   const filterVal = launches.filter((lname) => {
-  //     if (search === "") {
-  //       return lname;
-  //     } else if (
-  //       lname.mission_name
-  //         .toLowerCase()
-  //         .includes(search.toString().toLowerCase())
-  //     ) {
-  //       return lname;
-  //     }
-  //   });
-  //   setLaunches(filterVal);
-  // };
+    const newLaunch = launches
+      .sort((a, b) => {
+        if (a.mission_name > b.mission_name) {
+          return 1;
+        } else {
+          return -1;
+        }
+      })
+      .map((i) => {
+        return i;
+      });
 
+    setLaunches(newLaunch);
+  };
+
+  // Filter by date
+  const filterDate = () => {
+    const newLaunch = launches
+      .sort((a, b) => {
+        if (a.launch_date_local < b.launch_date_local) {
+          return -1;
+        }
+        if (a.launch_date_local > b.launch_date_local) {
+          return 1;
+        }
+        return 0;
+      })
+      .map((i) => {
+        return i;
+      });
+
+    setLaunches(newLaunch);
+  };
+
+  // Filter All
+  const setDefault = () => {
+    setSendRequest(true);
+  };
+
+  // Useeffect for filtering data
+  useEffect(() => {
+    if (sendRequest) {
+      fetch("https://api.spacex.land/graphql/", {
+        method: "POST",
+        headers: { "Content-Type": "Application/Json" },
+        body: JSON.stringify({ query: LAUNCHDATA }),
+      })
+        .then((res) => res.json())
+        .then((data) => setLaunches(data.data.launchesPast));
+      setSendRequest(false);
+    }
+  }, [sendRequest]);
+
+
+  // useEffect for getting data
   useEffect(() => {
     fetch("https://api.spacex.land/graphql/", {
       method: "POST",
@@ -83,36 +130,26 @@ function App() {
         <div className="filter">
           <p>Filter By: </p>
           <ul>
-            <li className="active">All</li>
+            <li className="active" onClick={setDefault}>
+              All
+            </li>
             <li onClick={filterName}>Name</li>
-            <li>Date</li>
+            <li onClick={filterDate}>Date</li>
           </ul>
         </div>
         <main className="data">
           <div className="dataCon">
             <span>December 20</span>
-            {launches
-              .filter((lname) => {
-                if (search === "") {
-                  return lname;
-                } else if (
-                  lname.mission_name
-                    .toLowerCase()
-                    .includes(search.toString().toLowerCase())
-                ) {
-                  return lname;
-                }
-              })
-              .map((launch) => (
-                <div key={launch.id} className="cont">
-                  <img src={launch.ships.map((i) => i.image)} alt="" />
-                  <div className="note">
-                    <h2>{launch.mission_name}</h2>
-                    <span>Port: {launch.ships.map((i) => i.name)}</span>;
-                    <p>{launch.launch_date_local}</p>
-                  </div>
+            {filterLaunches.map((launch) => (
+              <div key={launch.id} className="cont">
+                <img src={launch.ships.map((i) => i.image)} alt="" />
+                <div className="note">
+                  <h2>{launch.mission_name}</h2>
+                  <span>Port: {launch.ships.map((i) => i.name)}</span>;
+                  <p>{launch.launch_date_local}</p>
                 </div>
-              ))}
+              </div>
+            ))}
           </div>
         </main>
         <footer>
