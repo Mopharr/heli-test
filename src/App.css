@@ -71,7 +71,7 @@ main.data {
   padding-left: 1em;
   margin-top: 20px;
 }
-.filter ul li {
+.filter ul .link {
   list-style: none;
   margin-right: 1em;
   font-family: "Quicksand";
@@ -83,8 +83,17 @@ main.data {
   color: rgba(17, 16, 16, 0.5);
   cursor: pointer;
 }
-.filter ul li.active {
+.filter .active {
   color: #111010;
+  list-style: none;
+  margin-right: 1em;
+  font-family: "Quicksand";
+  font-style: normal;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 15px;
+  letter-spacing: 0.05em;
+  cursor: pointer;
 }
 
 .dataCon span {

@@ -30,13 +30,16 @@ function App() {
   // Filter data state
   const [sendRequest, setSendRequest] = useState(false);
 
-  // Search Filter 
+  // active color
+  const [tog, setTog] = useState(false);
+
+  // Search Filter
   const filterLaunches = launches.filter((lname) =>
     lname.mission_name.toLowerCase().includes(search.toString().toLowerCase())
   );
 
   // Filter by name
-  const filterName = () => {
+  const filterName = (e) => {
     const newLaunch = launches
       .sort((a, b) => {
         if (a.mission_name > b.mission_name) {
@@ -50,10 +53,11 @@ function App() {
       });
 
     setLaunches(newLaunch);
+    setTog(e.target.id);
   };
 
   // Filter by date
-  const filterDate = () => {
+  const filterDate = (e) => {
     const newLaunch = launches
       .sort((a, b) => {
         if (a.launch_date_local < b.launch_date_local) {
@@ -69,11 +73,13 @@ function App() {
       });
 
     setLaunches(newLaunch);
+    setTog(e.target.id);
   };
 
   // Filter All
-  const setDefault = () => {
+  const setDefault = (e) => {
     setSendRequest(true);
+    setTog(e.target.id);
   };
 
   // Useeffect for filtering data
@@ -89,7 +95,6 @@ function App() {
       setSendRequest(false);
     }
   }, [sendRequest]);
-
 
   // useEffect for getting data
   useEffect(() => {
@@ -130,11 +135,28 @@ function App() {
         <div className="filter">
           <p>Filter By: </p>
           <ul>
-            <li className="active" onClick={setDefault}>
+            <li
+              // className="active"
+              onClick={setDefault}
+              id="1"
+              className={`${tog === "1" ? "active" : "link"}`}
+            >
               All
             </li>
-            <li onClick={filterName}>Name</li>
-            <li onClick={filterDate}>Date</li>
+            <li
+              onClick={filterName}
+              id="2"
+              className={`${tog === "2" ? "active" : "link"}`}
+            >
+              Name
+            </li>
+            <li
+              onClick={filterDate}
+              id="3"
+              className={`${tog === "3" ? "active" : "link"}`}
+            >
+              Date
+            </li>
           </ul>
         </div>
         <main className="data">
